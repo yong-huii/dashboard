@@ -1,0 +1,71 @@
+/* antd Table 헤더 전체에 gray-100 배경색 적용 */
+.hover-scroll-table .ant-table-thead > tr > th {
+  background: #f3f4f6 !important;
+}
+@import "tailwindcss";
+@import "./fonts.css";
+
+@theme {
+  --color-background: #e5e7eb;
+}
+
+html {
+  color: #555879;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: none;
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #999999;
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* antd Table 전용: hover 시에만 스크롤바 thumb 노출 */
+.hover-scroll-table .ant-table-body,
+.hover-scroll-table .ant-table-content {
+  /* Firefox: 얇은 두께 */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.hover-scroll-table:hover .ant-table-body,
+.hover-scroll-table:hover .ant-table-content {
+  scrollbar-color: #999999 transparent; /* Firefox hover 색상 */
+}
+/* WebKit */
+.hover-scroll-table .ant-table-body::-webkit-scrollbar,
+.hover-scroll-table .ant-table-content::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+.hover-scroll-table .ant-table-body::-webkit-scrollbar-track,
+.hover-scroll-table .ant-table-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.hover-scroll-table .ant-table-body::-webkit-scrollbar-thumb,
+.hover-scroll-table .ant-table-content::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+.hover-scroll-table:hover .ant-table-body::-webkit-scrollbar-thumb,
+.hover-scroll-table:hover .ant-table-content::-webkit-scrollbar-thumb {
+  background: #999999;
+}
+
+/* 말줄임 처리 공통 */
+.table-ellipsis .ant-table-cell {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}

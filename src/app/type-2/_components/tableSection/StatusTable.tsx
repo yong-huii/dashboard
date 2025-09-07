@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -12,7 +12,6 @@ import { ConfigProvider, Table, TableProps } from "antd";
 import useGetErrorDataList from "@/_shared/api/services/type-2/useGetErrorDataList";
 import useGetLastHourDataList from "@/_shared/api/services/type-2/useGetLastHourDataList";
 import useGetStatusList from "@/_shared/api/services/type-2/useGetStatusList";
-import ResetButton from "@/_shared/components/ResetButton";
 import TableTitle from "@/_shared/components/TableTitle";
 import useDataCdStore from "@/_shared/store/type-2/dataCd";
 import { formatNumber } from "@/_shared/utils/formatNumber";
@@ -29,12 +28,76 @@ export default function StatusTable() {
 
   const { data: errorData } = useGetErrorDataList(dataCd, assetCd);
 
-  useEffect(() => {
-    setDataCd(data?.[0]?.DATA_CD || "");
-    setAssetCd(data?.[0]?.ASSET_CD || "");
-  }, [data, setDataCd, setAssetCd]);
+  const mockStatusData: DataType[] = useMemo(
+    () => [
+      {
+        DATA_CD: "202509070001",
+        ASSET_CD: "AST001",
+        assetNm: "사출기1호",
+        status: "0",
+        error_cnt: "12",
+      },
+      {
+        DATA_CD: "202509070002",
+        ASSET_CD: "AST002",
+        assetNm: "사출기2호",
+        status: "1",
+        error_cnt: "25",
+      },
+      {
+        DATA_CD: "202509070003",
+        ASSET_CD: "AST003",
+        assetNm: "사출기3호",
+        status: "2",
+        error_cnt: "41",
+      },
+      {
+        DATA_CD: "202509070004",
+        ASSET_CD: "AST004",
+        assetNm: "사출기4호",
+        status: "0",
+        error_cnt: "9",
+      },
+    ],
+    [],
+  );
 
-  // grid row 내부 자체 높이 측정 (스크롤 y 계산용)
+  const mockLastHourData: DataType[] = useMemo(
+    () => [
+      { assetNm: "사출기1호", status: "0", error_cnt: "12" },
+      { assetNm: "사출기2호", status: "1", error_cnt: "25" },
+      { assetNm: "사출기3호", status: "2", error_cnt: "41" },
+      { assetNm: "사출기4호", status: "0", error_cnt: "9" },
+    ],
+    [],
+  );
+
+  const mockErrorData = useMemo(
+    () => [
+      {
+        DTM: "2025-09-07 09:30:00",
+        DATA_CD: "202509070001",
+        ASSET_CD: "AST001",
+        error_cnt: "12",
+      },
+    ],
+    [],
+  );
+
+  const statusDataset = data && data.length > 0 ? data : mockStatusData;
+  const lastHourDataset =
+    lastHourData && lastHourData.length > 0 ? lastHourData : mockLastHourData;
+  const errorTimestamp = errorData?.[0]?.DTM || mockErrorData[0].DTM;
+
+  useEffect(() => {
+    if (statusDataset && statusDataset.length > 0) {
+      const firstDataCd = statusDataset[0].DATA_CD || "";
+      const firstAssetCd = statusDataset[0].ASSET_CD || "";
+      if (dataCd !== firstDataCd) setDataCd(firstDataCd);
+      if (assetCd !== firstAssetCd) setAssetCd(firstAssetCd);
+    }
+  }, [statusDataset, dataCd, assetCd, setDataCd, setAssetCd]);
+
   const wrapRef = useRef<HTMLDivElement>(null);
   const [innerHeight, setInnerHeight] = useState<number>(0);
   useEffect(() => {
@@ -57,10 +120,11 @@ export default function StatusTable() {
     return () => window.removeEventListener("resize", measure);
   }, []);
 
-  const tableData = lastHourData?.map((item, idx) => ({
+  const tableData = lastHourDataset.map((item, idx) => ({
     ...item,
-    DATA_CD: data?.[idx]?.DATA_CD || "",
-    ASSET_CD: data?.[idx]?.ASSET_CD || "",
+    DATA_CD: statusDataset?.[idx]?.DATA_CD || statusDataset[0]?.DATA_CD || "",
+    ASSET_CD:
+      statusDataset?.[idx]?.ASSET_CD || statusDataset[0]?.ASSET_CD || "",
   }));
 
   const columns: TableProps<DataType>["columns"] = [
@@ -162,48 +226,45 @@ export default function StatusTable() {
   return (
     <div
       ref={wrapRef}
-      className="row-span-1 flex flex-col overflow-hidden rounded-lg bg-white px-4 pt-4 pb-4 shadow-md lg:row-span-1 lg:pt-0"
-      style={{ height: "100%" }}
+      className="row-span-4 overflow-hidden rounded-lg bg-white px-4 pt-4 pb-4 shadow-md lg:row-span-5 lg:pt-0"
     >
       <TableTitle title="설비상태">
         <span className="text-xs font-[500] text-blue-800">
-          {errorData?.[0]?.DTM.slice(0, 19)}
+          {errorTimestamp.slice(0, 19)}
         </span>
       </TableTitle>
-      {isLastHourLoading && isStatusLoading ? (
+      {isLastHourLoading && isStatusLoading && !data ? (
         <div className="flex h-full w-full items-center justify-center">
           <LoadingOutlined style={{ fontSize: 36, color: "#555879" }} />
         </div>
       ) : (
-        <div className="border border-[#F0F0F0]">
-          <ConfigProvider
-            theme={{
-              components: {
-                Table: {
-                  headerBorderRadius: 0,
-                  headerBg: "#F3F4F6",
-                },
+        <ConfigProvider
+          theme={{
+            components: {
+              Table: {
+                headerBorderRadius: 0,
+                headerBg: "#F3F4F6",
               },
-            }}
-          >
-            <Table<DataType>
-              columns={columns}
-              dataSource={tableData}
-              pagination={false}
-              size="small"
-              scroll={{ x: "max-content", y: innerHeight - 70 }}
-              tableLayout="fixed"
-              rootClassName="hover-scroll-table table-ellipsis"
-              rowKey="assetNm"
-              onRow={row => ({
-                onClick: () => {
-                  setDataCd(row.DATA_CD);
-                  setAssetCd(row.ASSET_CD);
-                },
-              })}
-            />
-          </ConfigProvider>
-        </div>
+            },
+          }}
+        >
+          <Table<DataType>
+            columns={columns}
+            dataSource={tableData}
+            pagination={false}
+            size="small"
+            scroll={{ x: "max-content", y: innerHeight - 70 }}
+            tableLayout="fixed"
+            rootClassName="hover-scroll-table table-ellipsis side-border-table"
+            rowKey="assetNm"
+            onRow={row => ({
+              onClick: () => {
+                setDataCd(row.DATA_CD);
+                setAssetCd(row.ASSET_CD);
+              },
+            })}
+          />
+        </ConfigProvider>
       )}
     </div>
   );

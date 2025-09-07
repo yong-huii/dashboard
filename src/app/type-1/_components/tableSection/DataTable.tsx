@@ -112,9 +112,9 @@ export default function DataTable({
   ];
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg bg-white px-4 pt-4 pb-4 shadow-md lg:pt-0">
+    <div className="row-span-8 flex flex-col overflow-hidden rounded-lg bg-white px-4 pt-4 pb-4 shadow-md lg:row-span-5 lg:pt-0">
       <TableTitle title="비정형 분석 데이터">
-        <ResetButton onClick={refetch} />
+        <ResetButton refetch={refetch} />
       </TableTitle>
       {isLoading ? (
         <div className="flex h-full w-full items-center justify-center">

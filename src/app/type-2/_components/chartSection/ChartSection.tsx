@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 
+import { useIsPad } from "@/_shared/hooks/useIsDevice";
 import useIsLgUp from "@/_shared/hooks/useIsLgUp";
 
 import TableSection from "../tableSection/TableSection";
@@ -12,6 +13,8 @@ import DurationOnValueAxis from "./durationOnValueAxis/DurationOnValueAxis";
 import StripPlotContainer from "./stripPlot/StripPlotContainer";
 
 export default function ChartSection() {
+  const isPad = useIsPad();
+
   const [activeChart, setActiveChart] = useState([
     "stripPlot",
     "clusteredColumn",
@@ -19,7 +22,6 @@ export default function ChartSection() {
   ]);
   const isLgUp = useIsLgUp();
 
-  // 브레이크포인트 전환 시 서브/모바일 영역 재그리기 위해 resize 이벤트 트리거
   useEffect(() => {
     if (typeof window === "undefined") return;
     const t = setTimeout(() => window.dispatchEvent(new Event("resize")), 60);
@@ -48,13 +50,15 @@ export default function ChartSection() {
     <>
       <div className="grid h-full grid-cols-11 grid-rows-8 gap-4">
         <TableSection />
-        <div className="bg-background col-span-11 row-span-4 grid grid-cols-12 grid-rows-4 gap-4 select-none lg:col-span-9 lg:row-span-8">
+        <div
+          className={`bg-background col-span-11 row-span-4 grid grid-cols-12 grid-rows-8 gap-4 select-none lg:row-span-8 ${isPad ? "lg:col-span-8" : "lg:col-span-9"}`}
+        >
           {/* 메인영역 */}
-          <div className="relative col-span-12 row-span-4 h-full overflow-hidden rounded-lg bg-white shadow-md lg:col-span-8 lg:row-span-4">
+          <div className="relative col-span-12 row-span-8 h-full overflow-hidden rounded-lg bg-white shadow-md lg:row-span-5">
             {chartList.find(chart => chart.type === activeChart[0])?.chart}
           </div>
           {isLgUp && (
-            <div className="bg-background col-span-12 hidden grid-cols-2 gap-4 lg:col-span-4 lg:row-span-4 lg:grid lg:grid-cols-1 lg:grid-rows-2">
+            <div className="bg-background col-span-12 row-span-3 hidden grid-cols-2 gap-4 lg:grid lg:grid-cols-2 lg:grid-rows-1">
               {[1, 2].map(i => {
                 const type = activeChart[i];
                 const chart = chartList.find(

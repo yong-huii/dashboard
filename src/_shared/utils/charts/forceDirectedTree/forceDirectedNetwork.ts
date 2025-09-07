@@ -16,6 +16,12 @@ export interface ForceDirectedNetworkOptions {
   colors?: string[]; // 사용자 지정 색상 팔레트
   wrapColors?: boolean; // 팔레트 순환 (기본 true)
   randomizeColorOrder?: boolean; // 최초 1회 색상 랜덤 셔플
+  /** 노드 간 반발력 (manyBodyStrength). 더 (음수 절대값 ↑) = 더 멀어짐. 예: -15 기본, -30/-50 추천 */
+  repulsionStrength?: number;
+  /** 링크 기본 거리(px). 값이 크면 노드 사이 간격이 늘어남. 예: 60~120 */
+  linkDistance?: number;
+  /** 중심으로 끌어당기는 힘(centerStrength). 0~1 사이. 낮추면 퍼짐 */
+  centerStrength?: number;
 }
 
 /**
@@ -43,6 +49,9 @@ export function forceDirectedNetwork(
     colors,
     wrapColors = true,
     randomizeColorOrder = false,
+    repulsionStrength,
+    linkDistance,
+    centerStrength,
   } = options || {};
 
   const chart = am4core.create(
@@ -67,6 +76,15 @@ export function forceDirectedNetwork(
   networkSeries.fontSize = fontSize ?? 12;
   networkSeries.linkWithStrength = linkWithStrength ?? 0;
 
+  // 간격/배치 관련 추가 옵션 적용
+  if (typeof repulsionStrength === "number") {
+    // 더 큰(절대값) 음수 -> 더 강한 반발 -> 더 넓게 퍼짐
+    (networkSeries as any).manyBodyStrength = repulsionStrength;
+  }
+  if (typeof centerStrength === "number") {
+    (networkSeries as any).centerStrength = centerStrength;
+  }
+
   // 색상 팔레트 적용
   if (colors && colors.length) {
     const colorSet = new am4core.ColorSet();
@@ -84,12 +102,18 @@ export function forceDirectedNetwork(
 
   const nodeTemplate = networkSeries.nodes.template;
   nodeTemplate.tooltipText = "{name}";
+  // 툴팁 폰트 사이즈 강제 (테마/기존 tooltip 재사용 이슈 대비하여 새 Tooltip 인스턴스 지정)
+  nodeTemplate.tooltip = new am4core.Tooltip();
+  nodeTemplate.tooltip.label.fontSize = 12;
   nodeTemplate.fillOpacity = 1;
   nodeTemplate.label.hideOversized = true;
   nodeTemplate.label.truncate = true;
 
   const linkTemplate = networkSeries.links.template;
   linkTemplate.strokeWidth = 1;
+  if (typeof linkDistance === "number") {
+    (linkTemplate as any).distance = linkDistance; // 기본 거리 확대
+  }
   const linkHoverState = linkTemplate.states.create("hover");
   linkHoverState.properties.strokeOpacity = 1;
   linkHoverState.properties.strokeWidth = 2;

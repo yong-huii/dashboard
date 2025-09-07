@@ -3,11 +3,14 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 
+import { useIsPad } from "@/_shared/hooks/useIsDevice";
+
 import ClusteredBarContainer from "./clusteredBar/ClusteredBarContainer";
 import ForceDirectedTreeContainer from "./forceDirectedTree/ForceDirectedTreeContainer";
 import WordCloudContainer from "./wordCloud/WordCloudContainer";
 
 export default function ChartSection() {
+  const isPad = useIsPad();
   const [activeChart, setActiveChart] = useState(["force", "cluster", "word"]);
 
   const chartList = useMemo(
@@ -29,11 +32,13 @@ export default function ChartSection() {
   );
 
   return (
-    <div className="bg-background col-span-11 row-span-6 grid grid-cols-12 grid-rows-4 gap-4 select-none lg:col-span-9 lg:row-span-8">
-      <div className="relative col-span-12 row-span-3 h-full overflow-hidden rounded-lg bg-white shadow-md lg:col-span-8 lg:row-span-4">
+    <div
+      className={`bg-background col-span-11 row-span-6 grid grid-cols-12 grid-rows-8 gap-4 select-none lg:row-span-8 ${isPad ? "lg:col-span-8" : "lg:col-span-9"}`}
+    >
+      <div className="relative col-span-12 row-span-5 h-full overflow-hidden rounded-lg bg-white shadow-md">
         {chartList.find(chart => chart.type === activeChart[0])?.chart}
       </div>
-      <div className="bg-background col-span-12 row-span-1 grid grid-cols-2 gap-4 lg:col-span-4 lg:row-span-4 lg:grid-cols-1 lg:grid-rows-2">
+      <div className="bg-background col-span-12 row-span-3 grid grid-cols-2 gap-4 lg:grid-cols-2 lg:grid-rows-1">
         {[1, 2].map(i => {
           const type = activeChart[i];
           const chart = chartList.find(chart => chart.type === type)?.chart;

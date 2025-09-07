@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LoadingOutlined } from "@ant-design/icons";
 import {
   ConfigProvider,
@@ -21,11 +21,54 @@ interface DataType {
   name: string;
   total_count: string;
   error_cnt: string;
+  date?: string; // 실제 API 데이터 대비 (초기 날짜 추출용)
 }
 
 export default function ProduceTable() {
   const { date, setDate } = useDateStore();
   const { data, isLoading } = useGetProduceList(date);
+
+  // ================== 개발용 Mock Data (API 미응답 시) ==================
+  // - name: 설비명 (마지막 "총합" 행 포함)
+  // - total_count / error_cnt: 문자열 숫자 형태로 API 형식 맞춤
+  // - date: 첫 행에서 초기 날짜 추출 (YYYY-MM-DD)
+  const mockData: DataType[] = useMemo(
+    () => [
+      {
+        name: "사출기1호",
+        total_count: "187234",
+        error_cnt: "102",
+        date: "2025-09-07",
+      },
+      {
+        name: "사출기2호",
+        total_count: "165221",
+        error_cnt: "87",
+        date: "2025-09-07",
+      },
+      {
+        name: "사출기3호",
+        total_count: "142890",
+        error_cnt: "64",
+        date: "2025-09-07",
+      },
+      {
+        name: "사출기4호",
+        total_count: "158004",
+        error_cnt: "55",
+        date: "2025-09-07",
+      },
+      {
+        name: "총합",
+        total_count: "653349",
+        error_cnt: "308",
+        date: "2025-09-07",
+      },
+    ],
+    [],
+  );
+
+  const dataset = data && data.length > 0 ? data : mockData;
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const [innerHeight, setInnerHeight] = useState<number>(0);
@@ -145,16 +188,17 @@ export default function ProduceTable() {
   const initializedRef = useRef(false);
   useEffect(() => {
     if (initializedRef.current) return; // 이미 초기화됨
-    if (data && data.length > 0) {
-      setDate(dayjs(data[0].date).format("YYYYMMDD"));
+    if (dataset && dataset.length > 0) {
+      const firstDate = dataset[0].date || dayjs().format("YYYY-MM-DD");
+      setDate(dayjs(firstDate).format("YYYYMMDD"));
       initializedRef.current = true;
     }
-  }, [data, setDate]);
+  }, [dataset, setDate]);
 
   return (
     <div
       ref={wrapRef}
-      className="row-span-1 flex-col overflow-hidden rounded-lg bg-white px-4 pt-4 pb-4 shadow-md lg:flex lg:pt-0"
+      className="row-span-4 overflow-hidden rounded-lg bg-white px-4 pt-4 pb-4 shadow-md lg:row-span-3 lg:grid lg:pt-0"
     >
       <TableTitle title="일생산량">
         {isLoading || (
@@ -163,7 +207,7 @@ export default function ProduceTable() {
             <DatePicker
               value={dayjs(date)}
               onChange={DatePickerHandler}
-              className="w-[5.6rem]"
+              className="produce-date-picker w-[5.6rem]"
               style={{ color: "#555879" }}
               allowClear={false}
               size="small"
@@ -178,29 +222,27 @@ export default function ProduceTable() {
           <LoadingOutlined style={{ fontSize: 36, color: "#555879" }} />
         </div>
       ) : (
-        <div className="border border-[#F0F0F0]">
-          <ConfigProvider
-            theme={{
-              components: {
-                Table: {
-                  headerBorderRadius: 0,
-                  headerBg: "#F3F4F6",
-                },
+        <ConfigProvider
+          theme={{
+            components: {
+              Table: {
+                headerBorderRadius: 0,
+                headerBg: "#F3F4F6",
               },
-            }}
-          >
-            <Table<DataType>
-              columns={columns}
-              dataSource={data ?? []}
-              pagination={false}
-              size="small"
-              tableLayout="fixed"
-              scroll={{ x: "max-content", y: innerHeight - 70 }}
-              rootClassName="hover-scroll-table table-ellipsis"
-              rowKey="name"
-            />
-          </ConfigProvider>
-        </div>
+            },
+          }}
+        >
+          <Table<DataType>
+            columns={columns}
+            dataSource={dataset}
+            pagination={false}
+            size="small"
+            tableLayout="fixed"
+            scroll={{ x: "max-content", y: innerHeight - 70 }}
+            rootClassName="hover-scroll-table table-ellipsis side-border-table"
+            rowKey="name"
+          />
+        </ConfigProvider>
       )}
     </div>
   );

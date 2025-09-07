@@ -11,6 +11,39 @@ export default function ClusteredColumn() {
   const { date } = useDateStore();
   const { data } = useGetProduceList(date);
 
+  // ================== Mock Data (API 미응답 시) ==================
+  // name: 사출기N호, date: YYYY-MM-DD, total_count/error_cnt 제공
+  const mockRaw = useMemo(
+    () => [
+      {
+        name: "사출기1호",
+        date: "2025-09-01",
+        total_count: "18234",
+        error_cnt: "102",
+      },
+      {
+        name: "사출기2호",
+        date: "2025-09-01",
+        total_count: "16521",
+        error_cnt: "87",
+      },
+      {
+        name: "사출기3호",
+        date: "2025-09-01",
+        total_count: "14289",
+        error_cnt: "64",
+      },
+      {
+        name: "사출기4호",
+        date: "2025-09-01",
+        total_count: "15800",
+        error_cnt: "55",
+      },
+    ],
+    [],
+  );
+  const source = data && data.length > 0 ? data : (mockRaw as any[]);
+
   /**
    * 요구사항: x축 = date, 범례 = name
    * 현재 API 구조 (예상): [{ name, date, total_count, error_cnt, ... }, ...]
@@ -19,14 +52,14 @@ export default function ClusteredColumn() {
    * 각 name 이 하나의 시리즈가 되어 범례에 노출.
    */
   const { pivotData, seriesConfigs } = useMemo(() => {
-    if (!data)
+    if (!source)
       return {
         pivotData: [] as any[],
         seriesConfigs: [] as { valueField: string; name: string }[],
       };
 
     // 1) "총합" 제거 & 숫자 변환
-    const filtered = data
+    const filtered = source
       .filter(item => item.name !== "총합")
       .map(item => ({
         name: item.name,
@@ -53,7 +86,7 @@ export default function ClusteredColumn() {
     const series = names.map(n => ({ valueField: n, name: n }));
 
     return { pivotData: rows, seriesConfigs: series };
-  }, [data]);
+  }, [source]);
 
   // createChart: categoryField = 'date', 시리즈는 name 기반
   const create = (id: string, d: typeof pivotData) =>

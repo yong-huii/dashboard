@@ -54,6 +54,8 @@ export interface StripPlotOptions {
    * ValueAxis 의 기본 자동 라벨 대신 지정된 값에 한해 라벨 텍스트를 교체.
    */
   xLabelMap?: Record<number, string>;
+  /** 커스텀 Range 라벨 회전 각 (deg). 예: -45 */
+  xLabelRotation?: number;
 }
 
 export interface StripPlotResult {
@@ -91,6 +93,7 @@ export function stripPlot(
     showScrollbars = true,
     createXAxis,
     xLabelMap = {},
+    xLabelRotation,
   } = options;
 
   // 기존 root 제거 (hot reload 대응)
@@ -153,6 +156,7 @@ export function stripPlot(
         cellStartLocation: 0.1,
         cellEndLocation: 0.9,
         inversed: true,
+        minGridDistance: 20, // 행 간 최소 간격 확보로 라벨 스킵 완화
       }),
       bullet: (root, _axis, dataItem) => {
         const ctx: any = dataItem.dataContext;
@@ -229,7 +233,8 @@ export function stripPlot(
         forceHidden: false,
         centerX: am5.p50,
         centerY: am5.p0,
-        dy: 4,
+        dy: xLabelRotation ? 10 : 4,
+        rotation: typeof xLabelRotation === "number" ? xLabelRotation : 0,
         fill: am5.color("#9DA2B0"), // Y축 라벨 색상과 통일
         fontSize: FONT_SIZE,
       });

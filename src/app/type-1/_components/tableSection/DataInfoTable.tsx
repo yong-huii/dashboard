@@ -90,10 +90,7 @@ export default function DataInfoTable({ data, isLoading }: Props) {
   ];
 
   return (
-    <div
-      data-info-table
-      className="hidden min-h-[282px] flex-col overflow-hidden rounded-lg bg-white px-4 pb-4 shadow-md lg:flex"
-    >
+    <div className="row-span-3 hidden overflow-hidden rounded-lg bg-white px-4 pb-4 shadow-md lg:grid">
       <TableTitle title="데이터 분석 정보" />
       {isLoading ? (
         <div className="flex h-full w-full items-center justify-center">

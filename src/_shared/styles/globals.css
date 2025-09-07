@@ -69,3 +69,37 @@ html {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
+
+/* antd Table 좌우 보더만 (wrapper padding 영향 없이 테이블 폭에 딱 맞게) */
+.side-border-table .ant-table-container {
+  border-left: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+}
+/* 스크롤 영역에서 좌우 border 시각적 단절 방지 */
+.side-border-table .ant-table-body {
+  background-clip: padding-box;
+}
+
+/* ================= DatePicker (ProduceTable) 폰트 축소 & 높이 조절 ================= */
+.produce-date-picker.ant-picker {
+  --dp-font-size: 12px;
+  font-size: var(--dp-font-size) !important;
+  height: 24px;
+  padding: 0 4px;
+}
+.produce-date-picker .ant-picker-input > input,
+.produce-date-picker.produce-date-picker .ant-picker-input > input {
+  /* specificity 강화 */
+  font-size: var(--dp-font-size) !important;
+  line-height: 1.2 !important;
+  height: 20px;
+  padding: 0 0 0 2px !important;
+}
+.produce-date-picker .ant-picker-suffix,
+.produce-date-picker .ant-picker-clear {
+  font-size: 12px !important;
+  line-height: 1;
+}
+.produce-date-picker .ant-picker-input {
+  font-size: var(--dp-font-size) !important;
+}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import useGetDataList from "@/_shared/api/services/type-1/useGetDataList";
+import useGetReportData from "@/_shared/api/services/type-3/useReportData";
 import { useIsPad } from "@/_shared/hooks/useIsDevice";
 import useDataCdStore from "@/_shared/store/type-1/dataCd";
 
@@ -23,7 +23,7 @@ export interface DataType {
 export default function TableSection() {
   const isPad = useIsPad();
 
-  const { data, isLoading, refetch } = useGetDataList();
+  const { data, isLoading, refetch } = useGetReportData();
   const { setDataCd, dataCd } = useDataCdStore();
 
   const initializedRef = useRef(false);

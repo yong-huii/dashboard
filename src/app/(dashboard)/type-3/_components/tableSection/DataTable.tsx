@@ -74,6 +74,8 @@ export default function DataTable({ data, isLoading, refetch }: Props) {
     },
   ];
 
+  console.log(wrapRef.current?.clientHeight);
+
   return (
     <div
       className="row-span-8 flex flex-col overflow-hidden rounded-lg bg-white p-4 shadow-md lg:row-span-5 lg:pt-0"

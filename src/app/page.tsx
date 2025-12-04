@@ -1,5 +1,13 @@
-import { redirect } from "next/navigation";
+import Main from "./_components/main/Main";
+import Menu from "./_components/menu/Menu";
+import NewTabFloatButton from "./_components/NewTabFloatButton";
 
 export default function Home() {
-  redirect("/type-1");
+  return (
+    <div className="flex h-full w-full">
+      <Menu />
+      <Main />
+      <NewTabFloatButton />
+    </div>
+  );
 }

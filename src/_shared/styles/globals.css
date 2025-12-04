@@ -1,6 +1,12 @@
 /* antd Table 헤더 전체에 gray-100 배경색 적용 */
 .hover-scroll-table .ant-table-thead > tr > th {
   background: #f3f4f6 !important;
+  height: 28.5px !important;
+  min-height: 28.5px !important;
+  line-height: 28.5px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  vertical-align: middle !important;
 }
 @import "tailwindcss";
 @import "./fonts.css";
@@ -102,4 +108,23 @@ html {
 }
 .produce-date-picker .ant-picker-input {
   font-size: var(--dp-font-size) !important;
+}
+
+/* 선택된 행(selected-row)이 hover 되어도 antd 기본 hover 배경색이 우선되지 않도록 Tailwind bg-blue-50 색상으로 강제 적용 */
+.hover-scroll-table .ant-table-tbody > tr.selected-row > td,
+.hover-scroll-table .ant-table-tbody > tr.selected-row:hover > td {
+  background-color: #eff6ff !important;
+}
+
+.hover-scroll-table .ant-table-tbody > tr > td {
+  min-height: 28.5px !important;
+  line-height: 28.5px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  vertical-align: middle !important;
+}
+
+/* 보조 차트 컨테이너에서 ChartTitle을 작게 표시 */
+.reduced-chart-title .chart-title {
+  font-size: 12px !important;
 }

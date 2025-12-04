@@ -70,10 +70,15 @@ export const useDeviceInfo = () => {
     const mobileByCH = !!ch?.mobile;
     const isMobile = mobileByUA || mobileByCH;
 
+    // 화면 크기 기준을 더 완화 (500px 이상이면 태블릿으로 간주)
     const isAndroidTablet =
-      isAndroid && !/Mobile/i.test(ua) && window.innerWidth >= 600;
+      isAndroid && !/Mobile/i.test(ua) && window.innerWidth >= 500;
     const tabletUA = /Tablet|Tab\b/i.test(ua);
-    const isTablet = !isMobile && (isIPad || isAndroidTablet || tabletUA);
+    // 화면 크기가 500~1200px 사이면 태블릿으로 추가 간주
+    const isTabletScreen =
+      window.innerWidth >= 500 && window.innerWidth <= 1200;
+    const isTablet =
+      !isMobile && (isIPad || isAndroidTablet || tabletUA || isTabletScreen);
     const isDesktop = !isMobile && !isTablet;
 
     let isLaptopHeuristic = false;

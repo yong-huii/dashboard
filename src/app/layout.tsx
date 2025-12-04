@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 
 import "@/_shared/styles/globals.css";
 
-import QueryProvider from "@/_shared/api/query/queryProvider";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+
+import AppProvider from "./_components/provider/AppProvider";
 
 export const metadata: Metadata = {
   title: "app",
@@ -30,7 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="h-dvh w-full bg-white antialiased">
-        <QueryProvider>{children}</QueryProvider>
+        <AntdRegistry>
+          <AppProvider>{children}</AppProvider>
+        </AntdRegistry>
       </body>
     </html>
   );

@@ -74,16 +74,12 @@ export default function DataTable({ data, isLoading, refetch }: Props) {
     },
   ];
 
-  console.log(wrapRef.current?.clientHeight);
-
   return (
     <div
-      className="row-span-8 flex flex-col overflow-hidden rounded-lg bg-white p-4 shadow-md lg:row-span-5 lg:pt-0"
+      className="row-span-8 flex flex-col overflow-hidden rounded-lg bg-white p-6 shadow-md lg:row-span-5 lg:pt-0"
       ref={wrapRef}
     >
-      <TableTitle title="비정형 데이터 분석">
-        <ResetButton refetch={refetch} />
-      </TableTitle>
+      <TableTitle title="비정형 데이터 분석" />
       {isLoading ? (
         <div className="flex h-full w-full items-center justify-center">
           <LoadingOutlined style={{ fontSize: 36, color: "#555879" }} />

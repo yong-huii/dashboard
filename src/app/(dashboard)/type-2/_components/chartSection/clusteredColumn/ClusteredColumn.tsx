@@ -67,7 +67,5 @@ export default function ClusteredColumn() {
       colors: ["#7EA4E1", "#7D85E0", "#B17EE1", "#E07D81"],
     });
 
-  console.log(pivotData);
-
   return <Chart createChart={create} id="clustered-column" data={pivotData} />;
 }

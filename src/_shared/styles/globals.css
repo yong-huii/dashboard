@@ -17,6 +17,7 @@
 
 html {
   color: #555879;
+  font-size: 0.625rem; /* 10px */
 }
 
 *::-webkit-scrollbar {

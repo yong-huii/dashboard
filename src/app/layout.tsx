@@ -6,6 +6,8 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 
 import AppProvider from "./_components/provider/AppProvider";
 
+import "@ant-design/v5-patch-for-react-19";
+
 export const metadata: Metadata = {
   title: "app",
   description: "app",

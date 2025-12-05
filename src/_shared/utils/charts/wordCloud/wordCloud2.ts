@@ -120,7 +120,11 @@ export function wordCloud2(
     // 데이터 배열 모드
     series.dataFields.word = "tag" as any; // TS 타입 보완
     series.dataFields.value = "weight" as any;
-    series.data = input as any;
+    // 원본 weight를 별도 필드로 저장해서 이후 애니메이션 후 복구에 사용
+    series.data = input.map(d => ({
+      ...d,
+      originalValue: d.weight,
+    })) as any;
 
     if (useWeightAsFont) {
       // weight 범위 계산 (스케일 옵션 있을 때)
@@ -194,12 +198,33 @@ export function wordCloud2(
   let intervalId: any = null;
   const enableRandomize =
     randomize && !(isSmallScreen && disableRandomizeBelowBreakpoint);
+  // 퍼졌다가 다시 원래 배치로 수렴하도록, value를 잠시 변경 후 복구하는 애니메이션
+  const revertDelay = Math.min(1500, updateIntervalMs / 2); // 인터벌보다 짧게 설정
   if (enableRandomize) {
     intervalId = setInterval(() => {
       if (!series.dataItems.length) return;
       const idx = Math.floor(Math.random() * series.dataItems.length);
       const di = series.dataItems.getIndex(idx);
-      if (di) di.setValue("value", Math.round(Math.random() * randomValueMax));
+      if (!di) return;
+
+      const dc: any = di.dataContext || {};
+      const original =
+        typeof dc.originalValue === "number"
+          ? dc.originalValue
+          : (di.value as number);
+
+      // 1) value를 랜덤으로 변경해 잠시 퍼지게 함
+      const rand = Math.round(Math.random() * randomValueMax);
+      di.setValue("value", rand);
+
+      // 2) 짧은 시간 후 다시 원래 값으로 복구하여 기존 배치로 수렴
+      setTimeout(() => {
+        try {
+          di.setValue("value", original);
+        } catch (_) {
+          // chart dispose 중일 수 있으므로 에러 무시
+        }
+      }, revertDelay);
     }, updateIntervalMs);
   }
 
